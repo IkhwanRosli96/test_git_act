@@ -1,5 +1,6 @@
 name: Deploy on Server (Self-Hosted)
-
+env:
+  MY_TEST_SECRET: ${{ secrets.API_KEY }}
 on:
   push:
     branches: ["main"]   # change if you deploy from another branch
