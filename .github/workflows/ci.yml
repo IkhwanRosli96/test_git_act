@@ -27,13 +27,13 @@ jobs:
       - name: Wait for service
         run: |
           for i in {1..20}; do
-            if curl -fsS http://localhost:54010/health; then exit 0; fi
+            if curl -fsS http://localhost:54020/health; then exit 0; fi
             echo "Waiting for app... ($i)" && sleep 2
           done
           exit 1
 
       - name: Smoke test root endpoint
-        run: curl -fsS http://localhost:54010/ | jq .
+        run: curl -fsS http://localhost:54020/ | jq .
 
       - name: Tear down
         if: always()
