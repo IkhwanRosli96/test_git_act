@@ -1,0 +1,40 @@
+name: Deploy (Self-Hosted, Docker Compose)
+
+on:
+  push:
+    branches: ["main"]   # change if you deploy from another branch
+  workflow_dispatch: {}
+
+concurrency:
+  group: deploy-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: self-hosted
+    # Optionally require your specific labels:
+    # runs-on: [self-hosted, linux, x64, docker, prod]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # Optional: load environment file for compose
+      # - name: Create .env file for compose
+      #   run: |
+      #     cat > .env <<'EOF'
+      #     # put any runtime env here (or mount secrets)
+      #     APP_ENV=production
+      #     EOF
+
+      - name: Build & start with Docker Compose
+        run: |
+          docker compose pull || true
+          docker compose up -d --build
+
+      - name: Show status
+        run: |
+          docker compose ps
+          echo "Health check:"
+          curl -fsS http://localhost:8000/health || (docker compose logs --no-color && exit 1)
