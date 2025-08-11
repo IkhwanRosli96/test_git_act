@@ -12,8 +12,8 @@ docker compose build
 docker compose up -d
 
 # Test
-curl http://localhost:8000/
-curl http://localhost:8000/health
+curl http://localhost:54010/
+curl http://localhost:54010/health
 
 # Stop
 docker compose down -v

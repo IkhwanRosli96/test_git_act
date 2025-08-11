@@ -1,4 +1,4 @@
-name: Deploy (Self-Hosted, Docker Compose)
+name: Deploy on Server (Self-Hosted)
 
 on:
   push:
@@ -12,29 +12,21 @@ concurrency:
 jobs:
   deploy:
     runs-on: self-hosted
-    # Optionally require your specific labels:
-    # runs-on: [self-hosted, linux, x64, docker, prod]
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
-      # Optional: load environment file for compose
-      # - name: Create .env file for compose
-      #   run: |
-      #     cat > .env <<'EOF'
-      #     # put any runtime env here (or mount secrets)
-      #     APP_ENV=production
-      #     EOF
-
-      - name: Build & start with Docker Compose
+      - name: Build & (re)start with Docker Compose
         run: |
           docker compose pull || true
           docker compose up -d --build
 
-      - name: Show status
+      - name: Health check
         run: |
-          docker compose ps
-          echo "Health check:"
-          curl -fsS http://localhost:8000/health || (docker compose logs --no-color && exit 1)
+          for i in {1..15}; do
+            if curl -fsS http://localhost:54010/health > /dev/null; then
+              echo "Healthy"; exit 0; fi
+            echo "Waiting for app... ($i)"; sleep 2
+          done
+          echo "Health check failed"; docker compose logs --no-color; exit 1
