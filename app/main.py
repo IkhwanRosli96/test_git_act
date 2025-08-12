@@ -5,7 +5,7 @@ app = FastAPI()
 
 @app.get("/")
 def read_root():
-    return {"status": "ok", "message": "Hello from Docker CI sample! Please working!"}
+    return {"status": "ok", "message": "Hello from Docker CI sample! Please working!!!"}
 
 @app.get("/health")
 def health():
